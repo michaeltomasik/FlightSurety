@@ -78,7 +78,7 @@ contract('Flight Surety Tests', async (accounts) => {
 
     // ACT
     try {
-        await config.flightSuretyApp.registerAirline(newAirline, {from: config.firstAirline});
+        await config.flightSuretyApp.registerAirline('New Name', newAirline, {from: config.firstAirline});
     }
     catch(e) {
 

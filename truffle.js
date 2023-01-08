@@ -1,5 +1,5 @@
 var HDWalletProvider = require("truffle-hdwallet-provider");
-var mnemonic = "candy maple cake sugar pudding cream honey rich smooth crumble sweet treat";
+var mnemonic = "thunder outside way expose wood outside hat invest atom air adult caught";
 
 module.exports = {
   networks: {
@@ -8,12 +8,19 @@ module.exports = {
         return new HDWalletProvider(mnemonic, "http://127.0.0.1:8545/", 0, 50);
       },
       network_id: '*',
-      gas: 9999999
+      gas: 6721975, //from ganache-cli output
+      gasPrice: 20000000000, //From ganache-cli output
     }
   },
   compilers: {
     solc: {
-      version: "^0.4.24"
-    }
+      version: "0.5.0",
+      settings: {
+        optimizer: {
+          enabled: true, // Default: false
+          runs: 1000 // Default: 200
+        },
+      },
+    },
   }
-};
+}

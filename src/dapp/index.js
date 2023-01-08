@@ -10,14 +10,18 @@ import './flightsurety.css';
 
     let contract = new Contract('localhost', () => {
 
+        
         // Read transaction
         contract.isOperational((error, result) => {
             console.log(error,result);
             display('Operational Status', 'Check if contract is operational', [ { label: 'Operational Status', error: error, value: result} ]);
         });
+        contract.getAirlines((error, result) => {
+            console.log(error,result);
+            display('Airlines', 'Saved airlnes', [ { label: 'Airlines', error: error, value: result} ]);
+        });
     
 
-        // User-submitted transaction
         DOM.elid('submit-oracle').addEventListener('click', () => {
             let flight = DOM.elid('flight-number').value;
             // Write transaction
@@ -25,7 +29,25 @@ import './flightsurety.css';
                 display('Oracles', 'Trigger oracles', [ { label: 'Fetch Flight Status', error: error, value: result.flight + ' ' + result.timestamp} ]);
             });
         })
+
+        DOM.elid('submit-airline').addEventListener('click', () => {
+            console.log('HER submit-airline')
+            let name = DOM.elid('airline-name').value;
+            let address = DOM.elid('airline-address').value;
+            // Write transaction
+            contract.registerAirline(name, address, (error, result) => {
+                display('Airlines', '', [ { label: 'Registered Airline', error: error, value: result.flight + ' ' + result.timestamp} ]);
+            });
+        })
     
+        // User-submitted transaction
+        DOM.elid('submit-buy-insurance').addEventListener('click', () => {
+            let flight = DOM.elid('flight-number').value;
+            // Write transaction
+            contract.buyInsurance(flight, (error, result) => {
+                display('Insurance', 'Bought insurance', [ { label: 'Buy insurance', error: error, value: result.flight + ' ' + result.timestamp} ]);
+            });
+        })
     });
     
 
