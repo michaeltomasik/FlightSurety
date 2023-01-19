@@ -89,7 +89,7 @@ export default class Contract {
             timestamp: Math.floor(Date.now() / 1000)
         } 
         self.flightSuretyApp.methods
-        .registerAirline(payload.name, payload.address)
+        .registerAirline(payload.name, payload.address, false)
         .send({ from: payload.address,
             gas: 5000000,
             gasPrice: 20000000

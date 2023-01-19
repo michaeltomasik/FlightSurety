@@ -14,6 +14,7 @@ contract FlightSuretyData {
     struct Airline {
         string name;
         bool isRegistered;
+        uint votingPower;
     }
 
     struct Flight {
@@ -35,13 +36,18 @@ contract FlightSuretyData {
     mapping (bytes32 => Insurance[]) insuredPassengers;
                 // Blocks all state changes throughout the contract if false
     mapping(address => uint256) private authorizedContracts;
-    mapping(address => Airline) private airlines;
-    // address[] registeredAirlines = new address[](0);
+    mapping(address => Airline) airlines;
+    address[] registeredAirlines = new address[](0);
+    mapping(address => uint256) registerVoters;
+
 
     mapping(bytes32 => Flight) private flights;
     address[] registeredFlight = new address[](0);
     mapping (address => uint) public pendingPayments;
 
+
+    uint constant M = 4; // Number of required keys for tx
+    uint256 airlinesCounter = 0;
     /********************************************************************************************/
     /*                                       EVENT DEFINITIONS                                  */
     /********************************************************************************************/
@@ -62,6 +68,7 @@ contract FlightSuretyData {
                                 public 
     {
         contractOwner = msg.sender;
+        airlinesCounter++;
     }
 
     /********************************************************************************************/
@@ -150,17 +157,46 @@ contract FlightSuretyData {
     *      Can only be called from FlightSuretyApp contract
     *
     */   
-    function registerAirline(string calldata name, address addr) external requireIsOperational /* requireIsCallerAuthorized */ requireValidAddress(addr) returns(address airline) {
+    function registerAirline(string calldata name, address addr, bool isVoter) external requireIsOperational /* requireIsCallerAuthorized */ requireValidAddress(addr) returns(address airline) {
         require(!airlines[addr].isRegistered, "Airline has already been registered");
+        if (isVoter) {
+            airlines[addr].isRegistered = true;
+            airlines[addr].votingPower = 1;
+            registeredAirlines.push(addr);
+            emit AirlineRegistered(name, addr);
+        } else {
+            uint voters = getVoters(airlines);
+            require(voters < 2, "There was no consensus");
 
-        airlines[addr].isRegistered = true;
+            airlines[addr].isRegistered = true;
+            registeredAirlines.push(addr);
+            emit AirlineRegistered(name, addr);
 
-        emit AirlineRegistered(name, addr);
+        }
 
         return addr;
     }
 
 
+    function getVoters(mapping(address => Airline) storage airlines) public view returns (uint) {
+        address[] memory voters = new address[](address(this).balance);
+        uint voterCount = 0;
+        for (address voter = address(airlines); voter < address(airlines) + address(this).balance; voter++) {
+            if (airlines[voter].isRegistered && airlines[voter].votingPower > 0) {
+                voters[voterCount] = voter;
+                voterCount++;
+            }
+        }
+        return voterCount;
+    }
+
+
+
+
+
+    function getRegisteredAirlines()external view returns (address[] memory) {
+        return registeredAirlines;
+    }
    /**
     * @dev Buy insurance for a flight
     *

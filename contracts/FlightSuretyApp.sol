@@ -22,9 +22,6 @@ contract FlightSuretyApp {
     /*                                       DATA VARIABLES                                     */
     /********************************************************************************************/
 
-    uint constant M = 4; // Number of required keys for tx
-    bool private vote_status = false;
-
     // Flight status codees
     uint8 private constant STATUS_CODE_UNKNOWN = 0;
     uint8 private constant STATUS_CODE_ON_TIME = 10;
@@ -101,7 +98,7 @@ contract FlightSuretyApp {
     {
         contractOwner = msg.sender;
         flightSuretyData = FlightSuretyData(dataContract);
-
+        
     }
 
     /********************************************************************************************/
@@ -128,13 +125,14 @@ contract FlightSuretyApp {
     function registerAirline
                             (
                                 string memory name,
-                                address airline   
+                                address airline,
+                                bool isVoter
                             )
                             public
                             requireIsOperational
                             returns(bool success)                     
     {
-        flightSuretyData.registerAirline(name, airline);
+        flightSuretyData.registerAirline(name, airline, isVoter);
          
         emit RegisterAirline(airline);
         

@@ -42,6 +42,19 @@ web3.eth.getAccounts((error, accounts) => {
       console.log(`Authorized caller: ${config.appAddress}`);
     }
   });
+  // seed 4 accounts
+  let accountSeeds = [accounts[1], accounts[2], accounts[3],accounts[4]]
+  accountSeeds.forEach((address, index )=> {
+    flightSuretyData.methods.registerAirline(`airline-${index}`,address, true)
+      .send({from: owner}, (error, result) => {
+        if(error) {
+          console.log(error);
+        } 
+        else {
+          console.log(`Registred Airline: ${address}`);
+        }
+      });
+  })
   
   accounts.slice(20, 40).forEach(
     () => {
